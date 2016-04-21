@@ -730,6 +730,11 @@ THE SOFTWARE.
         <artifactId>wagon-gitsite</artifactId>
         <version>0.3.5</version>
       </extension>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-webdav-jackrabbit</artifactId>
+        <version>1.0</version>
+      </extension>
     </extensions>
   </build>
 
