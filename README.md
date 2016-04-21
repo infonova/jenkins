@@ -1,5 +1,8 @@
 [![][ButlerImage]][website] 
 
+# Infonova Jenkins Build
+[![Build Status](https://ci.infonova.at/job/DevOpSS/BUILD-jenkins-infonova/badge/icon)](https://ci.infonova.at/job/DevOpSS/BUILD-jenkins-infonova)
+
 # About
 In a nutshell, Jenkins CI is the leading open-source continuous integration server. Built with Java, it provides over 1000 plugins to support building and testing virtually any project.
 
