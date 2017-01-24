@@ -3,6 +3,8 @@ package jenkins.util;
 import hudson.security.ACL;
 import hudson.util.DaemonThreadFactory;
 import hudson.util.NamingThreadFactory;
+import jenkins.model.Configuration;
+
 import javax.annotation.Nonnull;
 import java.util.concurrent.ScheduledExecutorService;
 import jenkins.security.ImpersonatingScheduledExecutorService;
@@ -25,6 +27,8 @@ import jenkins.security.ImpersonatingScheduledExecutorService;
  */
 public class Timer {
 
+    private static final int THREAD_POOL_SIZE = Configuration.getIntConfigParameter("defaultThreadPoolSize", 10);
+
     /**
      * The scheduled executor thread pool. This is initialized lazily since it may be created/shutdown many times
      * when running the test suite.
@@ -42,7 +46,7 @@ public class Timer {
             // corePoolSize is set to 10, but will only be created if needed.
             // ScheduledThreadPoolExecutor "acts as a fixed-sized pool using corePoolSize threads"
             // TODO consider also wrapping in ContextResettingExecutorService
-            executorService = new ImpersonatingScheduledExecutorService(new ErrorLoggingScheduledThreadPoolExecutor(10, new NamingThreadFactory(new DaemonThreadFactory(), "jenkins.util.Timer")), ACL.SYSTEM);
+            executorService = new ImpersonatingScheduledExecutorService(new ErrorLoggingScheduledThreadPoolExecutor(THREAD_POOL_SIZE, new NamingThreadFactory(new DaemonThreadFactory(), "jenkins.util.Timer")), ACL.SYSTEM);
         }
         return executorService;
     }
