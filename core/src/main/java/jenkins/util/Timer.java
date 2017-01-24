@@ -2,6 +2,8 @@ package jenkins.util;
 
 import hudson.util.DaemonThreadFactory;
 import hudson.util.NamingThreadFactory;
+import jenkins.model.Configuration;
+
 import javax.annotation.Nonnull;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -23,6 +25,8 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class Timer {
 
+    private static final int THREAD_POOL_SIZE = Configuration.getIntConfigParameter("defaultThreadPoolSize", 10);
+
     /**
      * The scheduled executor thread pool. This is initialized lazily since it may be created/shutdown many times
      * when running the test suite.
@@ -39,7 +43,7 @@ public class Timer {
         if (executorService == null) {
             // corePoolSize is set to 10, but will only be created if needed.
             // ScheduledThreadPoolExecutor "acts as a fixed-sized pool using corePoolSize threads"
-            executorService =  new ErrorLoggingScheduledThreadPoolExecutor(10, new NamingThreadFactory(new DaemonThreadFactory(), "jenkins.util.Timer"));
+            executorService =  new ErrorLoggingScheduledThreadPoolExecutor(THREAD_POOL_SIZE, new NamingThreadFactory(new DaemonThreadFactory(), "jenkins.util.Timer"));
         }
         return executorService;
     }

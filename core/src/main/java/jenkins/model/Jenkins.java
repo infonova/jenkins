@@ -210,6 +210,7 @@ import jenkins.security.SecurityListener;
 import jenkins.security.MasterToSlaveCallable;
 import jenkins.slaves.WorkspaceLocator;
 import jenkins.util.JenkinsJVM;
+import jenkins.util.DependencyGraphRebuildTimer;
 import jenkins.util.Timer;
 import jenkins.util.io.FileBoolean;
 import jenkins.util.io.OnMaster;
@@ -350,9 +351,9 @@ public class Jenkins extends AbstractCIBase implements DirectlyModifiableTopLeve
      * The Jenkins instance startup type i.e. NEW, UPGRADE etc
      */
     private transient InstallState installState = InstallState.UNKNOWN;
-    
+
     /**
-     * If we're in the process of an initial setup, 
+     * If we're in the process of an initial setup,
      * this will be set
      */
     private transient SetupWizard setupWizard;
@@ -1031,7 +1032,7 @@ public class Jenkins extends AbstractCIBase implements DirectlyModifiableTopLeve
         agentProtocols = null;
         return this;
     }
-    
+
     /**
      * Get the Jenkins {@link jenkins.install.InstallState install state}.
      * @return The Jenkins {@link jenkins.install.InstallState install state}.
@@ -1046,7 +1047,7 @@ public class Jenkins extends AbstractCIBase implements DirectlyModifiableTopLeve
     }
 
     /**
-     * Update the current install state. This will invoke state.initializeState() 
+     * Update the current install state. This will invoke state.initializeState()
      * when the state has been transitioned.
      */
     @Restricted(NoExternalUse.class)
@@ -3405,6 +3406,7 @@ public class Jenkins extends AbstractCIBase implements DirectlyModifiableTopLeve
         LOGGER.log(Level.FINE, "Shutting down timer");
         try {
             Timer.shutdown();
+            DependencyGraphRebuildTimer.shutdown();
         } catch (SecurityException e) {
             LOGGER.log(WARNING, "Not permitted to shut down Timer", e);
             errors.add(e);
@@ -4466,16 +4468,26 @@ public class Jenkins extends AbstractCIBase implements DirectlyModifiableTopLeve
         return !"ISO-8859-1".equalsIgnoreCase(System.getProperty("file.encoding"));
     }
 
-    /**
-     * Rebuilds the dependency map.
-     */
-    public void rebuildDependencyGraph() {
+    private void rebuildDependencyGraphInternal() {
         DependencyGraph graph = new DependencyGraph();
         graph.build();
         // volatile acts a as a memory barrier here and therefore guarantees
         // that graph is fully build, before it's visible to other threads
         dependencyGraph = graph;
         dependencyGraphDirty.set(false);
+    }
+
+    /**
+     * Rebuilds the dependency map.
+     */
+    public void rebuildDependencyGraph() {
+        Future<DependencyGraph> future = rebuildDependencyGraphAsync(10);
+
+        try {
+            future.get();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Exception while rebuilding dependency graph:", e);
+        }
     }
 
     /**
@@ -4488,16 +4500,20 @@ public class Jenkins extends AbstractCIBase implements DirectlyModifiableTopLeve
      * @since 1.522
      */
     public Future<DependencyGraph> rebuildDependencyGraphAsync() {
+        return rebuildDependencyGraphAsync(500);
+    }
+
+    private Future<DependencyGraph> rebuildDependencyGraphAsync(int delay) {
         dependencyGraphDirty.set(true);
-        return Timer.get().schedule(new java.util.concurrent.Callable<DependencyGraph>() {
+        return DependencyGraphRebuildTimer.get().schedule(new java.util.concurrent.Callable<DependencyGraph>() {
             @Override
             public DependencyGraph call() throws Exception {
                 if (dependencyGraphDirty.get()) {
-                    rebuildDependencyGraph();
+                    rebuildDependencyGraphInternal();
                 }
                 return dependencyGraph;
             }
-        }, 500, TimeUnit.MILLISECONDS);
+        }, delay, TimeUnit.MILLISECONDS);
     }
 
     public DependencyGraph getDependencyGraph() {
@@ -4508,7 +4524,7 @@ public class Jenkins extends AbstractCIBase implements DirectlyModifiableTopLeve
     public List<ManagementLink> getManagementLinks() {
         return ManagementLink.all();
     }
-    
+
     /**
      * If set, a currently active setup wizard - e.g. installation
      *
@@ -4518,7 +4534,7 @@ public class Jenkins extends AbstractCIBase implements DirectlyModifiableTopLeve
     public SetupWizard getSetupWizard() {
         return setupWizard;
     }
-    
+
     /**
      * Exposes the current user to <tt>/me</tt> URL.
      */
@@ -4856,7 +4872,7 @@ public class Jenkins extends AbstractCIBase implements DirectlyModifiableTopLeve
                 LOGGER.log(Level.WARNING, "Unable to read Jenkins version: " + e.getMessage(), e);
             }
         }
-        
+
         VERSION = ver;
         context.setAttribute("version",ver);
 
