@@ -33,7 +33,7 @@ THE SOFTWARE.
 
   <groupId>org.jenkins-ci.main</groupId>
   <artifactId>pom</artifactId>
-  <version>1.609.3-INFONOVA-1-SNAPSHOT</version>
+  <version>1.609.3-INFONOVA-3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Jenkins main module</name>
@@ -60,7 +60,7 @@ THE SOFTWARE.
     <connection>scm:git:ssh://git.infonova.at:29418/devopss/jenkins/jenkins-infonova.git</connection>
     <developerConnection>scm:git:ssh://git.infonova.at:29418/devopss/jenkins/jenkins-infonova.git</developerConnection>
     <url>http://git.infonova.at:8080/gitblit/summary/devopss!jenkins!jenkins-infonova.git</url>
-    <tag>jenkins-1.609.3.syntaxhighlighting</tag>
+    <tag>1.609.3-INFONOVA-X</tag>
   </scm>
 
   <distributionManagement>
