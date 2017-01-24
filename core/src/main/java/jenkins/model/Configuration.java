@@ -39,5 +39,10 @@ public class Configuration {
             value = System.getProperty(Hudson.class.getName()+"." + name);
         return (value==null)?defaultValue:value;
     }
+
+    public static int getIntConfigParameter(String name, int defaultValue) {
+        String value = getStringConfigParameter(name, null);
+        return (value==null)?defaultValue:Integer.valueOf(value);
+    }
 }
 

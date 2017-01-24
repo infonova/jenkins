@@ -198,6 +198,7 @@ import jenkins.security.ConfidentialStore;
 import jenkins.security.SecurityListener;
 import jenkins.security.MasterToSlaveCallable;
 import jenkins.slaves.WorkspaceLocator;
+import jenkins.util.DependencyGraphRebuildTimer;
 import jenkins.util.Timer;
 import jenkins.util.io.FileBoolean;
 import net.sf.json.JSONObject;
@@ -2790,6 +2791,7 @@ public class Jenkins extends AbstractCIBase implements DirectlyModifiableTopLeve
         Trigger.timer = null;
 
         Timer.shutdown();
+        DependencyGraphRebuildTimer.shutdown();
 
         if(tcpSlaveAgentListener!=null)
             tcpSlaveAgentListener.shutdown();
@@ -3741,16 +3743,26 @@ public class Jenkins extends AbstractCIBase implements DirectlyModifiableTopLeve
         return !"ISO-8859-1".equalsIgnoreCase(System.getProperty("file.encoding"));
     }
 
-    /**
-     * Rebuilds the dependency map.
-     */
-    public void rebuildDependencyGraph() {
+    private void rebuildDependencyGraphInternal() {
         DependencyGraph graph = new DependencyGraph();
         graph.build();
         // volatile acts a as a memory barrier here and therefore guarantees
         // that graph is fully build, before it's visible to other threads
         dependencyGraph = graph;
         dependencyGraphDirty.set(false);
+    }
+
+    /**
+     * Rebuilds the dependency map.
+     */
+    public void rebuildDependencyGraph() {
+        Future<DependencyGraph> future = rebuildDependencyGraphAsync(10);
+
+        try {
+            future.get();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Exception while rebuilding dependency graph:", e);
+        }
     }
 
     /**
@@ -3763,16 +3775,20 @@ public class Jenkins extends AbstractCIBase implements DirectlyModifiableTopLeve
      * @since 1.522
      */
     public Future<DependencyGraph> rebuildDependencyGraphAsync() {
+        return rebuildDependencyGraphAsync(500);
+    }
+
+    private Future<DependencyGraph> rebuildDependencyGraphAsync(int delay) {
         dependencyGraphDirty.set(true);
-        return Timer.get().schedule(new java.util.concurrent.Callable<DependencyGraph>() {
+        return DependencyGraphRebuildTimer.get().schedule(new java.util.concurrent.Callable<DependencyGraph>() {
             @Override
             public DependencyGraph call() throws Exception {
                 if (dependencyGraphDirty.get()) {
-                    rebuildDependencyGraph();
+                    rebuildDependencyGraphInternal();
                 }
                 return dependencyGraph;
             }
-        }, 500, TimeUnit.MILLISECONDS);
+        }, delay, TimeUnit.MILLISECONDS);
     }
 
     public DependencyGraph getDependencyGraph() {
