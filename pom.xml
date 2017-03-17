@@ -48,24 +48,33 @@ THE SOFTWARE.
   </licenses>
 
   <modules>
+    <!-- for now we only need cli, core and war -->
     <module>core</module>
     <module>war</module>
-    <module>test</module>
     <module>cli</module>
+    <!-- module>test</module -->
+    <!-- module>plugins</module -->
   </modules>
 
   <scm>
-    <connection>scm:git:git://github.com/jenkinsci/jenkins.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/jenkinsci/jenkins.git</developerConnection>
-    <url>https://github.com/jenkinsci/jenkins</url>
-    <tag>jenkins-2.19.4-INFONOVA-1-SNAPSHOT</tag>
+    <connection>scm:git:https://github.com/infonova/jenkins.git</connection>
+    <developerConnection>scm:git:https://github.com/infonova/jenkins.git</developerConnection>
+    <url>https://github.com/infonova/jenkins</url>
+    <tag>2.19.4-INFONOVA-1-SNAPSHOT</tag>
   </scm>
 
   <distributionManagement>
-    <site>
-      <id>github-pages</id>
-      <url>gitsite:git@github.com/jenkinsci/maven-site.git:core</url>
-    </site>
+    <repository>
+      <id>nexus-infonova</id>
+      <name>Nexus at Infonova</name>
+      <url>http://grzmvn01.infonova.at:8082/nexus/content/repositories/ise-releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>nexus-infonova</id>
+      <name>Nexus at Infonova</name>
+      <url>http://grzmvn01.infonova.at:8082/nexus/content/repositories/ise-snapshots/</url>
+      <uniqueVersion>false</uniqueVersion>
+    </snapshotRepository>
   </distributionManagement>
 
   <issueManagement>
