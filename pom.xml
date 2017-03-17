@@ -50,28 +50,34 @@ THE SOFTWARE.
   <modules>
     <module>core</module>
     <module>war</module>
-    <module>test</module>
+    <!--module>test</module-->
     <module>cli</module>
   </modules>
 
   <scm>
-    <connection>scm:git:git://github.com/jenkinsci/jenkins.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/jenkinsci/jenkins.git</developerConnection>
-    <url>https://github.com/jenkinsci/jenkins</url>
+    <connection>scm:git:https://github.com/infonova/jenkins.git</connection>
+    <developerConnection>scm:git:https://github.com/infonova/jenkins.git</developerConnection>
+    <url>https://github.com/infonova/jenkins</url>
   </scm>
 
   <distributionManagement>
-    <site>
-      <id>github-pages</id>
-      <url>gitsite:git@github.com/jenkinsci/maven-site.git:core</url>
-    </site>
+    <repository>
+      <id>nexus-infonova</id>
+      <name>Nexus at Infonova</name>
+      <url>http://grzmvn01.infonova.at:8082/nexus/content/repositories/ise-releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>nexus-infonova</id>
+      <name>Nexus at Infonova</name>
+      <url>http://grzmvn01.infonova.at:8082/nexus/content/repositories/ise-snapshots/</url>
+      <uniqueVersion>false</uniqueVersion>
+    </snapshotRepository>
   </distributionManagement>
 
   <issueManagement>
     <system>jira</system>
     <url>https://issues.jenkins-ci.org/browse/JENKINS/component/15593</url>
   </issueManagement>
-
   <properties>
     <!-- *.html files are in UTF-8, and *.properties are in iso-8859-1, so this configuration is actually incorrect,
     but this suppresses a warning from Maven, and as long as we don't do filtering we should be OK. -->
