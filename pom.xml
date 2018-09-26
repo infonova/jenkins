@@ -34,7 +34,7 @@ THE SOFTWARE.
 
   <groupId>org.jenkins-ci.main</groupId>
   <artifactId>jenkins-parent</artifactId>
-  <version>2.121.3</version>
+  <version>2.121.3-INFONOVA-1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Jenkins main module</name>
@@ -51,22 +51,28 @@ THE SOFTWARE.
   <modules>
     <module>core</module>
     <module>war</module>
-    <module>test</module>
+    <!--module>test</module-->
     <module>cli</module>
   </modules>
 
   <scm>
-    <connection>scm:git:git://github.com/jenkinsci/jenkins.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/jenkinsci/jenkins.git</developerConnection>
-    <url>https://github.com/jenkinsci/jenkins</url>
-    <tag>jenkins-2.121.3</tag>
+    <connection>scm:git:https://github.com/infonova/jenkins.git</connection>
+    <developerConnection>scm:git:https://github.com/infonova/jenkins.git</developerConnection>
+    <url>https://github.com/infonova/jenkins</url>
   </scm>
 
   <distributionManagement>
-    <site>
-      <id>github-pages</id>
-      <url>gitsite:git@github.com/jenkinsci/maven-site.git:core</url>
-    </site>
+    <repository>
+      <id>nexus-infonova</id>
+      <name>Nexus at Infonova</name>
+      <url>http://grzmvn01.infonova.at:8082/nexus/content/repositories/ise-releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>nexus-infonova</id>
+      <name>Nexus at Infonova</name>
+      <url>http://grzmvn01.infonova.at:8082/nexus/content/repositories/ise-snapshots/</url>
+      <uniqueVersion>false</uniqueVersion>
+    </snapshotRepository>
   </distributionManagement>
 
   <issueManagement>
@@ -76,7 +82,7 @@ THE SOFTWARE.
 
   <properties>
     <revision>2.121.3</revision>
-    <changelist>-SNAPSHOT</changelist>
+    <changelist>-INFONOVA-1-SNAPSHOT</changelist>
 
     <!-- *.html files are in UTF-8, and *.properties are in iso-8859-1, so this configuration is actually incorrect,
     but this suppresses a warning from Maven, and as long as we don't do filtering we should be OK. -->
