@@ -119,7 +119,7 @@ THE SOFTWARE.
     <!-- TODO: JENKINS-36716 - Switch to Medium once FindBugs is cleaned up, 430 issues on Mar 10, 2018 -->
     <findbugs.effort>Max</findbugs.effort>
     <findbugs.threshold>High</findbugs.threshold>
-    <findbugs.excludeFilterFile>../src/findbugs/findbugs-excludes.xml</findbugs.excludeFilterFile>
+    <findbugs.excludeFilterFile>${project.basedir}/../src/findbugs/findbugs-excludes.xml</findbugs.excludeFilterFile>
   </properties>
 
   <!-- Note that the 'repositories' and 'pluginRepositories' blocks below are actually copy-pasted
